@@ -9,6 +9,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
 class ApiController extends Controller
 {
     /**
@@ -115,6 +119,29 @@ class ApiController extends Controller
         return $response;
     }
 
-    
+    /**
+     * @Route("/api/article/read-all", name="read_all_article")
+     *
+     */
+    public function readAllAction(Request $request)
+    {
+        $encoder = new JsonEncoder();
+        $normalizer = new GetSetMethodNormalizer();
+        $callback = function ($author) {
+            return $author->format('Y-m-d');
+        };
+        $callback_author = function ($author) {
+            return $author->getName();
+        };
+        $normalizer->setCallbacks(array('createdAt' => $callback, 'updatedAt'=> $callback, 'author'=>$callback_author));
+        $serializer = new Serializer(array($normalizer), array($encoder));
+
+
+        $em = $this->getDoctrine()->getManager();
+        $repoAuthor = $em->getRepository('AppBundle:Article');
+        $articles = $repoAuthor->findAll();
+        $response = $serializer->serialize($articles, 'json');
+        return new Response($response);
+    }
 
 }
