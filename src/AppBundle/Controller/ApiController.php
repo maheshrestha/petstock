@@ -144,4 +144,30 @@ class ApiController extends Controller
         return new Response($response);
     }
 
+    /**
+     * @Route("/api/article", name="read_one_article")
+     *
+     */
+    public function readOneAction(Request $request)
+    {
+        $encoder = new JsonEncoder();
+        $normalizer = new GetSetMethodNormalizer();
+        $callback = function ($author) {
+            return $author->format('Y-m-d');
+        };
+        $callback_author = function ($author) {
+            return $author->getName();
+        };
+        $normalizer->setCallbacks(array('createdAt' => $callback, 'updatedAt'=> $callback, 'author'=>$callback_author));
+        $serializer = new Serializer(array($normalizer), array($encoder));
+
+
+        $em = $this->getDoctrine()->getManager();
+        $body = $request->getContent();
+        $data = json_decode($body, true);
+        $repoArticle = $em->getRepository('AppBundle:Article');
+        $article = $repoArticle->find($data['id']);
+        $response = $serializer->serialize($article, 'json');
+        return new Response($response);
+    }
 }
