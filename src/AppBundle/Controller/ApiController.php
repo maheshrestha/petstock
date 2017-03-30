@@ -97,16 +97,14 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/article/Delete", name="delete_article")
-     * @method("POST")
+     * @Route("/api/article/delete/{article_id}", name="delete_article")
+     * @method("GET")
      *
      */
-    public function deleteAction(Request $request)
+    public function deleteAction($article_id)
     {
         $em = $this->getDoctrine()->getManager();
-        $body = $request->getContent();
-        $data = json_decode($body, true);
-        $article = $em->getRepository('AppBundle:Article')->find($data['id']);
+        $article = $em->getRepository('AppBundle:Article')->find($article_id);
         if($article){
             $em->remove($article);
             $em->flush();
@@ -121,6 +119,7 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/article/read-all", name="read_all_article")
+     * @Method("POST")
      *
      */
     public function readAllAction(Request $request)
@@ -146,9 +145,9 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/article", name="read_one_article")
-     *
+     * @Method("GET")
      */
-    public function readOneAction(Request $request)
+    public function readOneAction(Request $request, $article_id)
     {
         $encoder = new JsonEncoder();
         $normalizer = new GetSetMethodNormalizer();
@@ -163,10 +162,8 @@ class ApiController extends Controller
 
 
         $em = $this->getDoctrine()->getManager();
-        $body = $request->getContent();
-        $data = json_decode($body, true);
         $repoArticle = $em->getRepository('AppBundle:Article');
-        $article = $repoArticle->find($data['id']);
+        $article = $repoArticle->find($article_id);
         $response = $serializer->serialize($article, 'json');
         return new Response($response);
     }
