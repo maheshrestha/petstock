@@ -59,7 +59,7 @@ class ApiController extends Controller
             $response = new Response('Article Created successfully');
         }
         else{
-            $response = new Response('Invalid author_id');
+            $response = new Response('Invalid author_id', 400);
         }
 
         return $response;
@@ -90,7 +90,7 @@ class ApiController extends Controller
             $response = new Response('Article updated successfully');
         }
         else{
-            $response = new Response('Invalid author_id and/or article_id');
+            $response = new Response('Invalid author_id and/or article_id', 400);
         }
 
         return $response;
@@ -111,7 +111,7 @@ class ApiController extends Controller
             $response = new Response('Article deleted successfully');
         }
         else{
-            $response = new Response('Invalid article_id');
+            $response = new Response('Invalid article_id', 400);
         }
 
         return $response;
